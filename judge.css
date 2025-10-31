@@ -1,0 +1,113 @@
+:root {
+    --cor-fundo: #FFF1CB;    
+    --cor-codigo: #C2E2FA;   
+    --cor-io: #B7A3E3;       
+    --cor-botao: #FF8F8F;     
+    --cor-texto-escuro: #333;
+    --cor-texto-claro: #111;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background-color: var(--cor-fundo);
+    color: var(--cor-texto-escuro);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.container {
+    width: 100%;
+    max-width: 800px;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+h2 {
+    margin: 0;
+    padding: 16px 24px;
+    background-color: #f7f7f7;
+    border-bottom: 1px solid #eee;
+}
+
+.quadrado {
+    padding: 24px;
+    line-height: 1.6;
+}
+
+/* Caixa de Código (Editável) */
+#bloco-codigo {
+    background-color: var(--cor-codigo);
+    color: var(--cor-texto-claro);
+    border: none;
+    border-radius: 8px;
+    padding: 16px;
+    font-family: "Courier New", Courier, monospace;
+    font-size: 14px;
+    white-space: pre; /* Mantém a formatação */
+    overflow: auto;
+    min-height: 150px;
+}
+
+/* Caixa de Entrada (stdin) */
+#stdin-input {
+    background-color: var(--cor-io);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 16px;
+    width: 100%;
+    box-sizing: border-box; /* Garante que o padding não quebre o layout */
+    font-family: "Courier New", Courier, monospace;
+    font-size: 14px;
+    min-height: 80px;
+}
+
+#stdin-input::placeholder {
+    color: #f0f0f0;
+}
+
+/* Botão */
+#run-button {
+    display: block;
+    width: calc(100% - 48px); /* Largura total menos o padding */
+    margin: 0 24px 24px 24px;
+    padding: 16px;
+    font-size: 18px;
+    font-weight: bold;
+    color: white;
+    background-color: var(--cor-botao);
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.1s;
+}
+
+#run-button:hover {
+    background-color: #e67e7e;
+}
+
+#run-button:active {
+    transform: scale(0.98);
+}
+
+/* Caixa de Resultado */
+#output-box {
+    background-color: #333;
+    color: #f5f5f5;
+    border: none;
+    border-radius: 8px;
+    padding: 16px;
+    font-family: "Courier New", Courier, monospace;
+    font-size: 14px;
+    white-space: pre-wrap;
+    word-wrap: break-word; 
+    min-height: 100px;
+    margin-top: 16px;
+}

@@ -9,11 +9,20 @@ JUDGE0_URL = "http://judge.darlon.com.br"
 
 # Código Python a ser executado
 source_code = """
-print(input())
+# print(input()) 
+
+val_a = int(input())
+val_b = int(input())
+val_soma = val_a + val_b # <-- Corrigido
+print(f"{val_a} + {val_b} = {val_soma}")
 """
 
-# Entrada padrão (stdin)
-stdin = """Olá, Turma!"""
+
+# stdin = """Olá, Turma!""" 
+stdin = """\
+5
+10
+""" 
 
 # Converter ambos para Base64
 encoded_source = base64.b64encode(source_code.encode("utf-8")).decode("utf-8")
@@ -28,14 +37,13 @@ payload = {
     "wait": True
 }
 
-# Enviar submissão
+
 response = requests.post(f"{JUDGE0_URL}/submissions?base64_encoded=true&wait=true", json=payload)
 result = response.json()
 
-# Decodificar saída (vem em Base64)
 stdout = base64.b64decode(result.get("stdout") or "").decode("utf-8", errors="ignore")
 stderr = base64.b64decode(result.get("stderr") or "").decode("utf-8", errors="ignore")
 
 print("Status:", result["status"]["description"])
-print("Saída padrão:", stdout)
-print("Erros:", stderr)
+print("Saída padrão:", stdout.strip()) 
+print("Erros:", stderr.strip())
