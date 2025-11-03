@@ -5,20 +5,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Executor de Código Python</title>
     <link rel="stylesheet" href="judge.css">
-
 </head>
 <body>
 
     <div class="container">
         <h2>🐍 Código Python</h2>
         <div class="quadrado" style="padding-top: 0;">
-            <pre id="bloco-codigo" contenteditable="true"></pre>
+            <pre id="bloco-codigo" contenteditable="true">a = int(input())
+b = int(input())
+print(a + b)</pre>
         </div>
 
         <h2>📥 Entrada (stdin)</h2>
         <div class="quadrado">
-            <textarea id="stdin-input" placeholder="Digite a entrada aqui...">
-</textarea>
+            <textarea id="stdin-input" placeholder="Digite a entrada aqui...">3
+5</textarea>
+        </div>
+
+        <h2>🎯 Saída esperada</h2>
+        <div class="quadrado">
+            <textarea id="expected-output" placeholder="Digite a saída esperada aqui...">8</textarea>
         </div>
 
         <button id="run-button">Executar</button>
@@ -30,23 +36,18 @@
     </div>
 
     <script>
-        // URL da API Judge0
         const JUDGE0_URL = "http://judge.darlon.com.br";
         const url = `${JUDGE0_URL}/submissions?base64_encoded=true&wait=true`;
 
-        // Seleciona os elementos da página
         const runButton = document.getElementById("run-button");
         const codeBlock = document.getElementById("bloco-codigo");
         const stdinInput = document.getElementById("stdin-input");
+        const expectedOutputInput = document.getElementById("expected-output");
         const outputBox = document.getElementById("output-box");
 
-        /**
-         * Funções Helper para Base64 com suporte a UTF-8 (caracteres especiais)
-         * btoa() e atob() nativos do navegador falham com UTF-8
-         */
+        // Funções para conversão Base64 com suporte a UTF-8
         function utf8_to_b64(str) {
             try {
-                // Converte a string para um formato que o btoa entende
                 return btoa(unescape(encodeURIComponent(str)));
             } catch (e) {
                 console.error("Erro ao codificar para Base64:", e);
@@ -56,81 +57,93 @@
 
         function b64_to_utf8(str) {
             try {
-                // Converte de volta para a string UTF-8 original
                 return decodeURIComponent(escape(atob(str)));
             } catch (e) {
                 console.error("Erro ao decodificar de Base64:", e);
                 return "";
             }
         }
-        
-        // Função principal que será chamada pelo botão
-        async function submitCode() {
-            // Pega o conteúdo dos campos
-            // .innerText é usado para <pre> contenteditable
-            const source_code = codeBlock.innerText; 
-            const stdin = stdinInput.value;
 
-            // Mostra um status de carregamento
-            outputBox.style.color = "#ffff99"; // Amarelo para "carregando"
+        // Função de comparação e cálculo de porcentagem de acerto
+        function compararSaida(saida, esperado) {
+            saida = saida.trim();
+            esperado = esperado.trim();
+
+            if (saida === esperado) {
+                return { acerto: 100, mensagem: "✅ Saída correta!" };
+            }
+
+            let minLength = Math.min(saida.length, esperado.length);
+            let acertos = 0;
+            for (let i = 0; i < minLength; i++) {
+                if (saida[i] === esperado[i]) acertos++;
+            }
+
+            const porcentagem = ((acertos / esperado.length) * 100).toFixed(2);
+            return {
+                acerto: porcentagem,
+                mensagem: `❌ Saída incorreta (${porcentagem}% de acerto)`
+            };
+        }
+
+        async function submitCode() {
+            const source_code = codeBlock.innerText;
+            const stdin = stdinInput.value;
+            const expected = expectedOutputInput.value;
+
+            outputBox.style.color = "#ffff99";
             outputBox.innerText = "Enviando submissão... Aguarde...";
             runButton.disabled = true;
             runButton.innerText = "Executando...";
 
-            // 1. Codifica para Base64
             const encoded_source = utf8_to_b64(source_code);
             const encoded_stdin = utf8_to_b64(stdin);
 
-            // 2. Monta o Payload
             const payload = {
                 source_code: encoded_source,
-                language_id: 71,  // Python 3.x
+                language_id: 71,
                 stdin: encoded_stdin,
                 base64_encoded: true,
                 wait: true
             };
 
             try {
-                // 3. Envia a submissão (equivalente ao requests.post)
                 const response = await fetch(url, {
                     method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
+                    headers: { "Content-Type": "application/json" },
                     body: JSON.stringify(payload)
                 });
 
-                if (!response.ok) {
-                    throw new Error(`Erro HTTP! Status: ${response.status} ${response.statusText}`);
-                }
+                if (!response.ok) throw new Error(`Erro HTTP! Status: ${response.status}`);
 
                 const result = await response.json();
 
-                // 4. Decodifica a saída
-                const stdout = b64_to_utf8(result.stdout || "");
-                const stderr = b64_to_utf8(result.stderr || "");
+                const stdout = b64_to_utf8(result.stdout || "").trim();
+                const stderr = b64_to_utf8(result.stderr || "").trim();
                 const status = result.status?.description || "Status desconhecido";
-                
-                // 5. Exibe o resultado
-                outputBox.style.color = "#f5f5f5"; // Reseta a cor
-                outputBox.innerText = `Status: ${status}\n\n` +
-                                      `--- Saída Padrão (stdout) ---\n${stdout.trim()}\n\n` +
-                                      `--- Erros (stderr) ---\n${stderr.trim()}`;
+
+                const comparacao = compararSaida(stdout, expected);
+
+                // Define cor com base no acerto
+                outputBox.style.color = comparacao.acerto == 100 ? "#99ff99" : "#ff9999";
+
+                outputBox.innerText =
+                    `Status: ${status}\n\n` +
+                    `--- Saída Padrão (stdout) ---\n${stdout || "(vazio)"}\n\n` +
+                    `--- Erros (stderr) ---\n${stderr || "Nenhum"}\n\n` +
+                    `--- Comparação ---\n${comparacao.mensagem}\n` +
+                    `Esperado: "${expected}"\nObtido:  "${stdout}"`;
 
             } catch (error) {
-                // Trata erros de rede, CORS, ou falhas na requisição
                 console.error("Erro ao fazer a requisição:", error);
-                outputBox.style.color = "#ff9999"; // Vermelho para "erro"
-                outputBox.innerText = `❌ Erro ao fazer a requisição:\n${error.message}\n\n` +
-                                      `(Verifique o console do navegador. Pode ser um erro de CORS se o servidor http://judge.darlon.com.br não permitir.)`;
+                outputBox.style.color = "#ff9999";
+                outputBox.innerText = `❌ Erro ao fazer a requisição:\n${error.message}`;
             } finally {
-                // Reativa o botão
                 runButton.disabled = false;
                 runButton.innerText = "Executar";
             }
         }
 
-        // Adiciona o "ouvinte" de clique ao botão
         runButton.addEventListener("click", submitCode);
     </script>
 
