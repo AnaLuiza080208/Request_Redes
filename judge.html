@@ -1,151 +1,165 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Executor de Código Python</title>
-    <link rel="stylesheet" href="judge.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Executor de Código</title>
+  <link rel="stylesheet" href="judge.css">
 </head>
 <body>
 
-    <div class="container">
-        <h2>🐍 Código Python</h2>
-        <div class="quadrado" style="padding-top: 0;">
-            <pre id="bloco-codigo" contenteditable="true">a = int(input())
-b = int(input())
-print(a + b)</pre>
-        </div>
+  <div class="container">
+    <h2>💻 Executor de Código Online</h2>
 
-        <h2>📥 Entrada (stdin)</h2>
-        <div class="quadrado">
-            <textarea id="stdin-input" placeholder="Digite a entrada aqui...">3
-5</textarea>
-        </div>
+    <div class="quadrado selecao">
+      <div class="campo">
+        <label for="language-select">🧠 Linguagem:</label>
+        <select id="language-select">
+          <option value="71" selected>Python</option>
+          <option value="50">C</option>
+          <option value="54">C++</option>
+          <option value="63">JavaScript</option>
+          <option value="62">Java</option>
+        </select>
+      </div>
 
-        <h2>🎯 Saída esperada</h2>
-        <div class="quadrado">
-            <textarea id="expected-output" placeholder="Digite a saída esperada aqui...">8</textarea>
-        </div>
-
-        <button id="run-button">Executar</button>
-
-        <h2>🚀 Resultado</h2>
-        <div class="quadrado">
-            <pre id="output-box">Clique em 'Executar' para ver o resultado...</pre>
-        </div>
+      <div class="campo">
+        <label for="operation-select">🧩 Operação:</label>
+        <select id="operation-select">
+          <option value="soma" selected>Soma</option>
+          <option value="multiplicacao">Multiplicação</option>
+        </select>
+      </div>
     </div>
 
-    <script>
-        const JUDGE0_URL = "http://judge.darlon.com.br";
-        const url = `${JUDGE0_URL}/submissions?base64_encoded=true&wait=true`;
+    <h2>📜 Código</h2>
+    <div class="quadrado" style="padding-top: 0;">
+      <pre id="bloco-codigo" contenteditable="true">a = int(input())
+b = int(input())
+print(a + b)</pre>
+    </div>
 
-        const runButton = document.getElementById("run-button");
-        const codeBlock = document.getElementById("bloco-codigo");
-        const stdinInput = document.getElementById("stdin-input");
-        const expectedOutputInput = document.getElementById("expected-output");
-        const outputBox = document.getElementById("output-box");
+    <h2>📥 Entrada (stdin)</h2>
+    <div class="quadrado">
+      <textarea id="stdin-input" placeholder="Digite a entrada aqui...">3
+5</textarea>
+    </div>
 
-        // Funções para conversão Base64 com suporte a UTF-8
-        function utf8_to_b64(str) {
-            try {
-                return btoa(unescape(encodeURIComponent(str)));
-            } catch (e) {
-                console.error("Erro ao codificar para Base64:", e);
-                return "";
-            }
-        }
+    <h2>🎯 Saída esperada</h2>
+    <div class="quadrado">
+      <textarea id="expected-output" placeholder="Digite a saída esperada aqui..."></textarea>
+    </div>
 
-        function b64_to_utf8(str) {
-            try {
-                return decodeURIComponent(escape(atob(str)));
-            } catch (e) {
-                console.error("Erro ao decodificar de Base64:", e);
-                return "";
-            }
-        }
+    <button id="run-button">🚀 Executar Código</button>
 
-        // Função de comparação e cálculo de porcentagem de acerto
-        function compararSaida(saida, esperado) {
-            saida = saida.trim();
-            esperado = esperado.trim();
+    <h2>📊 Resultado</h2>
+    <div class="quadrado">
+      <pre id="output-box">Clique em "Executar Código" para ver o resultado...</pre>
+    </div>
+  </div>
 
-            if (saida === esperado) {
-                return { acerto: 100, mensagem: "✅ Saída correta!" };
-            }
+  <script>
+    const JUDGE0_URL = "http://judge.darlon.com.br";
+    const url = `${JUDGE0_URL}/submissions?base64_encoded=true&wait=true`;
 
-            let minLength = Math.min(saida.length, esperado.length);
-            let acertos = 0;
-            for (let i = 0; i < minLength; i++) {
-                if (saida[i] === esperado[i]) acertos++;
-            }
+    const runButton = document.getElementById("run-button");
+    const codeBlock = document.getElementById("bloco-codigo");
+    const stdinInput = document.getElementById("stdin-input");
+    const expectedOutputInput = document.getElementById("expected-output");
+    const outputBox = document.getElementById("output-box");
+    const languageSelect = document.getElementById("language-select");
+    const operationSelect = document.getElementById("operation-select");
 
-            const porcentagem = ((acertos / esperado.length) * 100).toFixed(2);
-            return {
-                acerto: porcentagem,
-                mensagem: `❌ Saída incorreta (${porcentagem}% de acerto)`
-            };
-        }
+    // Atualiza o código conforme a operação escolhida
+    operationSelect.addEventListener("change", () => {
+      const op = operationSelect.value;
+      if (op === "soma") {
+        codeBlock.innerText = `a = int(input())
+b = int(input())
+print(a + b)`;
+      } else {
+        codeBlock.innerText = `a = int(input())
+b = int(input())
+print(a * b)`;
+      }
+    });
 
-        async function submitCode() {
-            const source_code = codeBlock.innerText;
-            const stdin = stdinInput.value;
-            const expected = expectedOutputInput.value;
+    // Funções Base64
+    function utf8_to_b64(str) {
+      return btoa(unescape(encodeURIComponent(str)));
+    }
 
-            outputBox.style.color = "#ffff99";
-            outputBox.innerText = "Enviando submissão... Aguarde...";
-            runButton.disabled = true;
-            runButton.innerText = "Executando...";
+    function b64_to_utf8(str) {
+      return decodeURIComponent(escape(atob(str)));
+    }
 
-            const encoded_source = utf8_to_b64(source_code);
-            const encoded_stdin = utf8_to_b64(stdin);
+    // Comparação de saída
+    function compararSaida(saida, esperado) {
+      saida = saida.trim();
+      esperado = esperado.trim();
 
-            const payload = {
-                source_code: encoded_source,
-                language_id: 71,
-                stdin: encoded_stdin,
-                base64_encoded: true,
-                wait: true
-            };
+      if (esperado === "") return { acerto: "-", mensagem: "ℹ️ Nenhuma saída esperada informada." };
 
-            try {
-                const response = await fetch(url, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(payload)
-                });
+      if (saida === esperado) return { acerto: 100, mensagem: "✅ Saída correta!" };
 
-                if (!response.ok) throw new Error(`Erro HTTP! Status: ${response.status}`);
+      let minLength = Math.min(saida.length, esperado.length);
+      let acertos = 0;
+      for (let i = 0; i < minLength; i++) if (saida[i] === esperado[i]) acertos++;
 
-                const result = await response.json();
+      const porcentagem = ((acertos / esperado.length) * 100).toFixed(2);
+      return { acerto: porcentagem, mensagem: `❌ Saída incorreta (${porcentagem}% de acerto)` };
+    }
 
-                const stdout = b64_to_utf8(result.stdout || "").trim();
-                const stderr = b64_to_utf8(result.stderr || "").trim();
-                const status = result.status?.description || "Status desconhecido";
+    async function submitCode() {
+      const source_code = codeBlock.innerText;
+      const stdin = stdinInput.value;
+      const expected = expectedOutputInput.value;
+      const language_id = parseInt(languageSelect.value);
 
-                const comparacao = compararSaida(stdout, expected);
+      outputBox.style.color = "#ffff99";
+      outputBox.innerText = "⏳ Enviando submissão...";
+      runButton.disabled = true;
+      runButton.innerText = "Executando...";
 
-                // Define cor com base no acerto
-                outputBox.style.color = comparacao.acerto == 100 ? "#99ff99" : "#ff9999";
+      const payload = {
+        source_code: utf8_to_b64(source_code),
+        stdin: utf8_to_b64(stdin),
+        language_id,
+        base64_encoded: true,
+        wait: true
+      };
 
-                outputBox.innerText =
-                    `Status: ${status}\n\n` +
-                    `--- Saída Padrão (stdout) ---\n${stdout || "(vazio)"}\n\n` +
-                    `--- Erros (stderr) ---\n${stderr || "Nenhum"}\n\n` +
-                    `--- Comparação ---\n${comparacao.mensagem}\n` +
-                    `Esperado: "${expected}"\nObtido:  "${stdout}"`;
+      try {
+        const response = await fetch(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
 
-            } catch (error) {
-                console.error("Erro ao fazer a requisição:", error);
-                outputBox.style.color = "#ff9999";
-                outputBox.innerText = `❌ Erro ao fazer a requisição:\n${error.message}`;
-            } finally {
-                runButton.disabled = false;
-                runButton.innerText = "Executar";
-            }
-        }
+        if (!response.ok) throw new Error(`Erro HTTP ${response.status}`);
+        const result = await response.json();
 
-        runButton.addEventListener("click", submitCode);
-    </script>
+        const stdout = b64_to_utf8(result.stdout || "").trim();
+        const stderr = b64_to_utf8(result.stderr || "").trim();
+        const status = result.status?.description || "Status desconhecido";
+        const comparacao = compararSaida(stdout, expected);
 
+        outputBox.style.color = comparacao.acerto == 100 ? "#99ff99" : "#ff9999";
+        outputBox.innerText =
+          `Status: ${status}\n\n` +
+          `--- Saída ---\n${stdout || "(vazio)"}\n\n` +
+          `--- Erros ---\n${stderr || "Nenhum"}\n\n` +
+          `--- Comparação ---\n${comparacao.mensagem}`;
+      } catch (error) {
+        outputBox.style.color = "#ff9999";
+        outputBox.innerText = `❌ Erro: ${error.message}`;
+      } finally {
+        runButton.disabled = false;
+        runButton.innerText = "🚀 Executar Código";
+      }
+    }
+
+    runButton.addEventListener("click", submitCode);
+  </script>
 </body>
 </html>

@@ -97,7 +97,6 @@ h2 {
     transform: scale(0.98);
 }
 
-/* Caixa de Resultado */
 #output-box {
     background-color: #333;
     color: #f5f5f5;
@@ -111,3 +110,88 @@ h2 {
     min-height: 100px;
     margin-top: 16px;
 }
+
+.cabecalho {
+    text-align: center;
+    background-color: var(--cor-codigo);
+    color: var(--cor-texto-claro);
+    padding: 20px;
+    border-bottom: 4px solid var(--cor-botao);
+}
+
+.cabecalho h1 {
+    margin: 0;
+    font-size: 1.8rem;
+}
+
+.cabecalho p {
+    margin: 8px 0 0;
+    font-size: 0.95rem;
+}
+
+.selecao {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 20px 24px;
+    background-color: #f9f9f9;
+    border-bottom: 1px solid #eee;
+}
+
+.campo {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.campo label {
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: var(--cor-texto-escuro);
+}
+
+.campo select {
+    background-color: var(--cor-io);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 10px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: transform 0.1s ease;
+}
+
+.campo select:hover {
+    transform: scale(1.02);
+}
+
+.rodape {
+    text-align: center;
+    padding: 16px;
+    background-color: #f7f7f7;
+    color: var(--cor-texto-claro);
+    font-size: 0.9rem;
+    border-top: 1px solid #eee;
+}
+
+select {
+    background-color: var(--cor-codigo);
+    color: var(--cor-texto-claro);
+    border: none;
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 14px;
+    margin-top: 8px;
+    cursor: pointer;
+    transition: 0.2s;
+  }
+  
+  select:hover {
+    background-color: #a9d4f2;
+  }
+  
+  label {
+    font-weight: bold;
+    color: var(--cor-texto-escuro);
+  }
+  
